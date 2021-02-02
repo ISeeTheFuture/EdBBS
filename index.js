@@ -1,7 +1,11 @@
+// Package Definition
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var flash = require('connect-flash');
+var session = require('express-session');
+var passport = require('./config/passport');
 var app = express();
 
 // DB setting
@@ -24,6 +28,19 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+app.use(flash());
+app.use(session({secret:'MySecret', resave:true, saveUninitialized:true}));
+
+// Passport // Other settings 보다 밑에 둬야 함
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Custom Middlewares(for Passport)// 로그인에 관련되었으므로 route 무시하도록 Routes보다 무조건 위에 올려 놓을 것.
+app.use(function(req,res,next){
+    res.locals.isAuthenticated = req.isAuthenticated();
+    res.locals.currentUser = req.user;
+    next();
+});
 
 // Routes
 app.use('/', require('./routes/home'));
