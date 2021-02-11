@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/User');
+var util = require('../util.js');
 
 // Index
 router.get('/', function (req, res) {
@@ -24,7 +25,7 @@ router.post('/', function (req, res) {
     User.create(req.body, function (err, user) {
         if (err) {
             req.flash('user', req.body);
-            req.flash('errors', parseError(err));
+            req.flash('errors', util.parseError(err));
             return res.redirect('/users/new');
         }
         res.redirect('/users');
@@ -41,15 +42,14 @@ router.get('/:username', function (req, res) {
 
 // edit
 router.get('/:username/edit', function (req, res) {
-    var user = req.flash('user')[0];
+    var user = req.flash('user')[0]; // 처음 들어오는 경우 분기 처리가 필요하므로 {}로 빈 객체를 넣지 않는다.
     var errors = req.flash('errors')[0] || {};
-    if (!user) {
+    if (!user) { // user가 없으면 처음 들어온 경우이므로, 기존의 값을 form에 넣는다.
         User.findOne({ username: req.params.username }, function (err, user) {
             if (err) { return res.json(err); }
             res.render('users/edit', { username: req.params.username, user: user, errors: errors });
         });
-    }
-    else {
+    } else { // user가 있으면 오류가 있어 update에서 돌아온 경우이다.
         res.render('users/edit', { username: req.params.username, user: user, errors: errors });
     }
 });
@@ -72,7 +72,7 @@ router.put('/:username', function (req, res, next) {
             user.save(function (err, user) {
                 if (err) {
                     req.flash('user', req.body);
-                    req.flash('errors', parseError(err));
+                    req.flash('errors', util.parseError(err));
                     return res.redirect('/users/' + req.params.username + '/edit');
                 }
                 res.redirect('/users/' + user.username);
@@ -89,21 +89,3 @@ router.delete('/:username', function (req, res) {
 });
 
 module.exports = router;
-
-// functions
-function parseError(errors) {
-    var parsed = {};
-    if (errors.name == 'ValidationError') {
-        for (var name in errors.errors) {
-            var validationError = errors.errors[name];
-            parsed[name] = { message: validationError.message };
-        }
-    }
-    else if (errors.code == '11000' && errors.errmsg.indexOf('username') > 0) {
-        parsed.username = { message: 'This username already exists!' };
-    }
-    else {
-        parsed.unhandled = JSON.stringify(errors);
-    }
-    return parsed;
-}
