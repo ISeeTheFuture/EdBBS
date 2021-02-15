@@ -6,6 +6,7 @@ var util = require('../util.js');
 // Index 
 router.get('/', function (req, res) {
     Post.find({})
+        .populate('author') // populate : user.id값을 author에 생성.
         .sort('-createdAt')
         .exec(function (err, posts) {
             if (err) { return res.json(err); }
@@ -22,6 +23,7 @@ router.get('/new', function (req, res) {
 
 // create
 router.post('/', function (req, res) {
+    req.body.author = req.user._id; // req.user는 로그인시 passport에서 자동 생성
     Post.create(req.body, function (err, post) {
         if (err) {
             req.flash('post', req.body);
@@ -33,10 +35,12 @@ router.post('/', function (req, res) {
 });
 
 // show
-router.get('/:id', function (req, res) {
-    Post.findOne({ _id: req.params.id }, function (err, post) {
-        if (err) { return res.json(err); }
-        res.render('posts/show', { post: post });
+router.get('/:id', function (req, res) { // /:id에 get 요청이 오는경우
+    Post.findOne({ _id: req.params.id }) // 해당 req의 id를 찾아
+        .populate('author') // author에 넣어
+        .exec(function (err, post) { // 게시글을 보여준다.
+            if (err) { return res.json(err); }
+            res.render('posts/show', { post: post });
     });
 });
 
