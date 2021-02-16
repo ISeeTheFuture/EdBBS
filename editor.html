@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+    <link rel="stylesheet" href="/public/css/editor.css">
+    <title>심플에디터 Mark 1</title>
+</head>
+<body>
+    <div class="toolbar">
+        <a href="" data-command='h1'>H1</a> 
+        <a href="" data-command='h2'>H2</a>
+        <a href="" data-command='h3'>H3</a>
+        <a href="" data-command='p' style="margin-right: 8px;">P</a>
+        <a href="" data-command='bold'>
+            <i class='fa fa-bold'></i>
+        </a>
+        <a href="" data-command='italic'>
+            <i class='fa fa-italic'></i>
+        </a>
+        <a href="" data-command='underline'>
+            <i class='fa fa-underline'></i>
+        </a>
+        <a href="" data-command='strikeThrough'style="margin-right: 8px;">
+            <i class='fa fa-strikethrough'></i>
+        </a>
+        <a href="" data-command='justifyLeft'>
+            <i class='fa fa-align-left'></i>
+        </a>
+        <a href="" data-command='justifyCenter'>
+            <i class='fa fa-align-center'></i>
+        </a>
+        <a href="" data-command='justifyRight'>
+            <i class='fa fa-align-right'></i>
+        </a>
+        <a href="" data-command='justifyFull' style="margin-right: 8px;">
+            <i class='fa fa-align-justify'></i>
+        </a>
+        <a href="" data-command='copy' style="margin-right: 8px;">
+            <i class='fa fa-copy'></i>
+        </a>
+        <select name="job" id='test'>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+        </select>
+    </div>
+    <div class='editor' contenteditable="true">
+        <h1>h1에서 다른 것으로 바꿔보자</h1>
+        <p>p태그인데 다른 것으로 바꿔보자</p>
+    </div>
+    <script src="/public/js/editor.js"></script>
+</body>
+</html>
