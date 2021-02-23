@@ -15,14 +15,14 @@ router.get('/', function (req, res) {
 });
 
 // New
-router.get('/new', function (req, res) {
+router.get('/new', util.isLoggedin, function (req, res) { // util.isLoggedin이 true 여야만 동작.
     var post = req.flash('post')[0]||{};
     var errors = req.flash('errors')[0]||{};
     res.render('posts/new', {post:post, errors:errors});
 });
 
 // create
-router.post('/', function (req, res) {
+router.post('/', util.isLoggedin, function (req, res) {
     req.body.author = req.user._id; // req.user는 로그인시 passport에서 자동 생성
     Post.create(req.body, function (err, post) {
         if (err) {
@@ -45,7 +45,7 @@ router.get('/:id', function (req, res) { // /:id에 get 요청이 오는경우
 });
 
 // edit
-router.get('/:id/edit', function (req, res) {
+router.get('/:id/edit', util.isLoggedin, checkPermission, function (req, res) {
     var post = req.flash('post')[0]; // 처음 들어오는 경우 분기 처리가 필요하므로 {}로 빈 객체를 넣지 않는다.
     var errors = req.flash('errors')[0]||{};
     if(!post) { // post가 없으면 처음 들어온 경우이므로, 기존의 값을 form에 넣는다.
@@ -60,7 +60,7 @@ router.get('/:id/edit', function (req, res) {
 });
 
 // update
-router.put('/:id', function (req, res) {
+router.put('/:id', util.isLoggedin, checkPermission, function (req, res) {
     req.body.updatedAt = Date.now();
     Post.findOneAndUpdate({ _id: req.params.id }, req.body, {runValidators:true}, function (err, post) { // findOneAndUpdate 함수에서 runValidators 기본값은 false이므로 true로.
         if (err) {
@@ -72,8 +72,8 @@ router.put('/:id', function (req, res) {
     });
 });
 
-// destroy
-router.delete('/:id', function (req, res) {
+// delete
+router.delete('/:id', util.isLoggedin, checkPermission, function (req, res) {
     Post.deleteOne({ _id: req.params.id }, function (err) {
         if (err) { return res.json(err); }
         res.redirect('/posts');
@@ -81,3 +81,11 @@ router.delete('/:id', function (req, res) {
 });
 
 module.exports = router;
+
+function checkPermission(req, res, next) { // 일단 게시물 수정, 삭제 시만 생각.
+    Post.findOne({ _id:req.params.id }, function(err, post) {
+        if(err) { return res.json(err); }
+        if(post.author != req.user.id) { return util.noPermission(req, res); } // 게시물 작성자가 아니면 noPermission 함수 호출.
+        next();
+    });
+}

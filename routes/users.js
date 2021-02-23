@@ -4,7 +4,8 @@ var User = require('../models/User');
 var util = require('../util.js');
 
 // Index
-router.get('/', function (req, res) {
+// Todo... 관리자 전용으로 바꿀 것.
+router.get('/', util.isLoggedin, function (req, res) {
     User.find({})
         .sort({ username: 1 }) // -1 : 내림차순
         .exec(function (err, users) {
@@ -33,7 +34,7 @@ router.post('/', function (req, res) {
 });
 
 // show
-router.get('/:username', function (req, res) {
+router.get('/:username', util.isLoggedin, checkPermission, function (req, res) {
     User.findOne({ username: req.params.username }, function (err, user) {
         if (err) { return res.json(err); }
         res.render('users/show', { user: user });
@@ -41,7 +42,7 @@ router.get('/:username', function (req, res) {
 });
 
 // edit
-router.get('/:username/edit', function (req, res) {
+router.get('/:username/edit', util.isLoggedin, checkPermission, function (req, res) {
     var user = req.flash('user')[0]; // 처음 들어오는 경우 분기 처리가 필요하므로 {}로 빈 객체를 넣지 않는다.
     var errors = req.flash('errors')[0] || {};
     if (!user) { // user가 없으면 처음 들어온 경우이므로, 기존의 값을 form에 넣는다.
@@ -55,7 +56,7 @@ router.get('/:username/edit', function (req, res) {
 });
 
 // update
-router.put('/:username', function (req, res, next) {
+router.put('/:username', util.isLoggedin, checkPermission, function (req, res, next) {
     User.findOne({ username: req.params.username })
         .select('password')
         .exec(function (err, user) {
@@ -80,8 +81,9 @@ router.put('/:username', function (req, res, next) {
         });
 });
 
-// destroy
-router.delete('/:username', function (req, res) {
+delete
+// Todo... 관리자 전용으로 바꿀 것.
+router.delete('/:username', util.isLoggedin, function (req, res) {
     User.deleteOne({ username: req.params.username }, function (err) {
         if (err) { return res.json(err); }
         res.redirect('/users');
@@ -89,3 +91,11 @@ router.delete('/:username', function (req, res) {
 });
 
 module.exports = router;
+
+function checkPermission(req, res, next) {
+    User.findOne({ username:req.params.username }, function(err, user) {
+        if(err) { return res.json(err); }
+        if(user.id != req.user.id) { return util.noPermission(req, res); } // 유저 본인이 아니면 noPermission 함수 호출.
+        next();
+    });
+}
