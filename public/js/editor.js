@@ -9,6 +9,6 @@ document.querySelectorAll('.toolbar a').forEach(aEl => aEl.addEventListener('cli
     }
 }))
 
-document.getElementById('test').addEventListener('change', function (e) {
+document.getElementById('fontSize').addEventListener('change', function (e) {
     document.execCommand('fontSize', false, e.target.value); 
 })
