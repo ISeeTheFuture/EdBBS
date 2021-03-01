@@ -1,14 +1,39 @@
-document.querySelectorAll('.toolbar a').forEach(aEl => aEl.addEventListener('click', function (e) {
-    e.preventDefault(); 
-    const command = aEl.dataset.command;  
-  
-    if (command == 'h1' || command == 'h2' || command == 'h3' || command == 'p') { 
-        document.execCommand('formatBlock', false, command);
-    } else {
-        document.execCommand(command); 
-    }
-}))
+var showSourceCode = false;
+var isEditMode = true;
 
-document.getElementById('fontSize').addEventListener('change', function (e) {
-    document.execCommand('fontSize', false, e.target.value); 
-})
+user_pref("capability.policy.policynames", "allowclipboard");
+user_pref("capability.policy.allowclipboard.sites", "https://www.mozilla.org");
+user_pref("capability.policy.allowclipboard.Clipboard.cutcopy", "allAccess");
+user_pref("capability.policy.allowclipboard.Clipboard.paste", "allAccess");
+
+function enableEditMode() {
+    richTextField.document.designMode = 'On';
+}
+
+function execCmd(command) {
+    richTextField.document.execCommand(command, false, null);
+}
+
+function execCommandWithArg(command, arg) {
+    richTextField.document.execCommand(command, false, arg);
+}
+
+function toggleSource() {
+    if(showSourceCode) {
+        richTextField.document.getElementsByTagName('body')[0].innerHTML = richTextField.document.getElementsByTagName('body')[0].textContent;
+        showSourceCode = false;
+    } else {
+        richTextField.document.getElementsByTagName('body')[0].textContent = richTextField.document.getElementsByTagName('body')[0].innerHTML;
+        showSourceCode = true;
+    }
+}
+
+function toggleEdit(argument) {
+    if(isEditMode) {
+        richTextField.document.designMode = 'Off';
+        isEditMode = false;
+    } else {
+        richTextField.document.designMode = 'On';
+        isEditMode = true;
+    }
+}
