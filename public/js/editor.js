@@ -32,3 +32,7 @@ function toggleEdit(argument) {
         isEditMode = true;
     }
 }
+
+function submitContent() {
+    document.getElementById("body").value = richTextField.document.body.innerHTML;
+}
