@@ -2,8 +2,9 @@
 <html>
 <head>
     <%- include('../partials/head') %>
+    <script src="https://kit.fontawesome.com/4c554cd518.js"></script>
 </head>
-<body>
+<body onload="enableEditMode();">
     <%- include('../partials/nav') %>
     <div class="container mb-3">
         <nav aria-label="breadcrumb">
@@ -23,10 +24,65 @@
                 </span>
                 <% } %>
             </div>
-            
+            <div>
+                <button type="button" onclick="execCmd('bold');"><i class="fa fa-bold"></i></button> <!--타입 명시 안해놓으면 submit으로 간주됨-->
+                <button type="button" onclick="execCmd('italic');"><i class="fa fa-italic"></i></button>
+                <button type="button" onclick="execCmd('underline');"><i class="fa fa-underline"></i></button>
+                <button type="button" onclick="execCmd('strikeThrough');"><i class="fa fa-strikethrough"></i></button>
+                <button type="button" onclick="execCmd('justifyLeft');"><i class="fa fa-align-left"></i></button>
+                <button type="button" onclick="execCmd('justifyCenter');"><i class="fa fa-align-center"></i></button>
+                <button type="button" onclick="execCmd('justifyRight');"><i class="fa fa-align-right"></i></button>
+                <button type="button" onclick="execCmd('justifyFull');"><i class="fa fa-align-justify"></i></button>
+                <button type="button" onclick="execCmd('cut');"><i class="fa fa-cut"></i></button>
+                <button type="button" onclick="execCmd('copy');"><i class="fa fa-copy"></i></button>
+                <!-- <button type="button" onclick="execCmd('paste');"><i class="fa fa-paste"></i></button> 크롬에서는 아예 막아놓음 -->
+                <button type="button" onclick="execCmd('indent');"><i class="fa fa-indent"></i></button>
+                <button type="button" onclick="execCmd('outdent');"><i class="fa fa-dedent"></i></button>
+                <button type="button" onclick="execCmd('subscript');"><i class="fa fa-subscript"></i></button>
+                <button type="button" onclick="execCmd('superscript');"><i class="fa fa-superscript"></i></button>
+                <button type="button" onclick="execCmd('undo');"><i class="fa fa-undo"></i></button>
+                <button type="button" onclick="execCmd('redo');"><i class="fa fa-repeat"></i></button>
+                <button type="button" onclick="execCmd('insertUnorderedList');"><i class="fa fa-list-ul"></i></button>
+                <button type="button" onclick="execCmd('insertOrderedList');"><i class="fa fa-list-ol"></i></button>
+                <button type="button" onclick="execCmd('insertParagraph');"><i class="fa fa-paragraph"></i></button>
+                <select onchange="execCommandWithArg('formatBlock', this.value);">
+                    <option value="H1">H1</option>
+                    <option value="H2">H2</option>
+                    <option value="H3">H3</option>
+                    <option value="H4">H4</option>
+                    <option value="H5">H5</option>
+                    <option value="H6">H6</option>
+                </select>
+                <button type="button" onclick="execCmd('insertHorizontalRule');">HR</button>
+                <button type="button" onclick="execCommandWithArg('createLink', prompt('Enter a URL', 'http://'));"><i class="fa fa-link"></i></button>
+                <button type="button" onclick="execCmd('unlink');"><i class="fa fa-unlink"></i></button>
+                <button type="button" onclick="toggleSource();"><i class="fa fa-code"></i></button>
+                <button type="button" onclick="toggleEdit();">편집 잠금</button>
+                <br />
+                <select onchange="execCommandWithArg('fontName', this.value);">
+                    <option value="Arial">Arial</option>
+                    <option value="굴림">굴림</option>
+                    <option value="신명조">신명조</option>
+                    <option value="맑은고딕">맑은고딕</option>
+                </select>
+                <select onchange="execCommandWithArg('fontSize', this.value);">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                </select>
+                글자 색상: <input type="color" onchange="execCommandWithArg('foreColor', this.value)">
+                하이라이트 : <input type="color" onchange="execCommandWithArg('hiliteColor', this.value)">
+                <button type="button" onclick="execCommandWithArg('insertImage', prompt('Enter the image URL', ''));"><i class="fa fa-file-image-o"></i></button>
+                <button type="button" onclick="execCmd('selectAll');">전체 선택</button>
+            </div>
+            <iframe id="richTextField" name="richTextField" style="width: 1000px; height: 500px;" contenteditable="true" class="form-control <%= (errors.body)?'is-invalid':'' %>"><%= post.body %></iframe>
             <div class="form-group">
                 <label for="body">Body</label>
-                <textarea id="body" name="body" rows="5" class="form-control <%= (errors.body)?'is-invalid':'' %>"><%= post.body %></textarea>
+                <input type="hidden" name="body" id="body"/>
                 <% if(errors.body) { %>
                 <span class="invalid-feedback">
                     <%= errors.body.message %>
@@ -42,9 +98,10 @@
 
             <div>
                 <a class="btn btn-primary" href="/posts">Back</a>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary" onclick="submitContent();">Submit</button>
             </div>
         </form>
     </div>
+    <script type="text/javascript" src="/js/editor.js"></script>
 </body>
 </html>
